@@ -7,6 +7,17 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <TabControl x:Name="tbCtrlAutoGeist" HorizontalAlignment="Left" Height="372" Margin="19,29,0,0" VerticalAlignment="Top" Width="754">
+            <TabItem x:Name="Cars" Header="Cars">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Header="Customers">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Header="Orders">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+
     </Grid>
 </Window>
