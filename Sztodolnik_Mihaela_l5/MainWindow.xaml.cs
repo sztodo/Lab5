@@ -12,17 +12,47 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data.Entity;
+using AutoGeisdtModel;
+using System.Data;
 
 namespace Sztodolnik_Mihaela_l5
 {
+    enum ActionState { New, Edit, Delete, Nothing }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        ActionState action = ActionState.Nothing;
+        AutoGeistEntitiesModel ctx = new AutoGeistEntitiesModel();
+        CollectionViewSource carViewSource;
+        CollectionViewSource customerViewSource;
+        Binding bodyStyleTextBoxBinding = new Binding();
+        Binding modelTextBoxBinding = new Binding();
+        Binding makeTextBoxBinding = new Binding();
+        Binding purchaseTextBoxBinding = new Binding();
+        Binding fnameTextBoxBinding = new Binding();
+        Binding lnameTextBoxBinding = new Binding();
+
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
+            modelTextBoxBinding.Path = new PropertyPath("Model");
+            makeTextBoxBinding.Path = new PropertyPath("Make");
+            bodyStyleTextBoxBinding.Path = new PropertyPath("BodyStyle");
+            modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+            makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+            bodyStyleTextBox.SetBinding(TextBox.TextProperty, bodyStyleTextBoxBinding);
+            fnameTextBoxBinding.Path = new PropertyPath("FirstName");
+            lnameTextBoxBinding.Path = new PropertyPath("LastName");
+            //purchaseTextBoxBinding.Path = new PropertyPath("PurchaseDate");
+            firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
+            lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
+            //purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -34,6 +64,198 @@ namespace Sztodolnik_Mihaela_l5
             System.Windows.Data.CollectionViewSource customerViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("customerViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             // customerViewSource.Source = [generic data source]
+            carViewSource =
+        ((System.Windows.Data.CollectionViewSource)(this.FindResource("carViewSource")));
+            carViewSource.Source = ctx.Cars.Local;
+            ctx.Cars.Load();
         }
+        private void btnNew_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.New;
+            TabItem ti = tbCtrlAutoGeist.SelectedItem as TabItem;
+            switch (ti.Header)
+            {
+                case "Cars":
+                    BindingOperations.ClearBinding(bodyStyleTextBox, TextBox.TextProperty);
+                    BindingOperations.ClearBinding(makeTextBox, TextBox.TextProperty);
+                    BindingOperations.ClearBinding(modelTextBox, TextBox.TextProperty);
+                    bodyStyleTextBox.Text = "";
+                    makeTextBox.Text = "";
+                    modelTextBox.Text = "";
+                    Keyboard.Focus(bodyStyleTextBox);
+                    break;
+                case "Customers":
+                    BindingOperations.ClearBinding(firstNameTextBox, TextBox.TextProperty);
+                    BindingOperations.ClearBinding(lastNameTextBox, TextBox.TextProperty);
+                    firstNameTextBox.Text = "";
+                    lastNameTextBox.Text = "";
+                    Keyboard.Focus(firstNameTextBox);
+                    break;
+                case "Orders":
+                    break;
+            }
+        }
+        private void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.Edit;
+        }
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.Delete;
+        }
+        private void btnNext_Click(object sender, RoutedEventArgs e)
+        {
+                    carViewSource.View.MoveCurrentToNext();
+        }
+        private void btnPrevious_Click(object sender, RoutedEventArgs e)
+        {
+                    carViewSource.View.MoveCurrentToPrevious();
+         
+        }
+        private void btnNext1_Click(object sender, RoutedEventArgs e)
+        {
+            customerViewSource.View.MoveCurrentToNext();
+        }
+        private void btnPrv_Click(object sender, RoutedEventArgs e)
+        {
+            customerViewSource.View.MoveCurrentToPrevious();
+        }
+        private void SaveCars()
+        {
+            Car car = null;
+            if (action == ActionState.New)
+            {
+                try
+                {
+                    car = new Car()
+                    {
+                        Make = makeTextBox.Text.Trim(),
+                        Model = modelTextBox.Text.Trim(),
+                        BodyStyle = bodyStyleTextBox.Text.Trim(),
+                    };
+                    ctx.Cars.Add(car);
+                    carViewSource.View.Refresh();
+                    carViewSource.View.MoveCurrentTo(car);
+                    ctx.SaveChanges();
+                }
+                // using System.Data;
+                catch (System.Data.DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
+               bodyStyleTextBoxBinding);
+            }
+            else if (action == ActionState.Edit)
+            {
+                try
+                {
+                    car = (Car)carDataGrid.SelectedItem;
+                    car.Make = makeTextBox.Text.Trim();
+                    car.Model = modelTextBox.Text.Trim();
+                    car.BodyStyle = bodyStyleTextBox.Text.Trim();
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                carViewSource.View.Refresh();
+                carViewSource.View.MoveCurrentTo(car);
+                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
+               bodyStyleTextBoxBinding);
+            }
+            else if (action == ActionState.Delete)
+            {
+                try
+                {
+                    car = (Car)carDataGrid.SelectedItem;
+                    ctx.Cars.Remove(car);
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                carViewSource.View.Refresh();
+                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
+               bodyStyleTextBoxBinding);
+            }
+        }
+        private void SaveCustomers()
+        {
+            Customer customer = null;
+            if (action == ActionState.New)
+            {
+                try
+                {
+                    customer = new Customer()
+                    {
+                        FirstName = firstNameTextBox.Text.Trim(),
+                        LastName = lastNameTextBox.Text.Trim(),
+                        PurchaseDate = purchaseDateDatePicker.ClearValue.ToString("dd/MM/yyy"),
+                    };
+                    ctx.Customer.Add(customer);
+                    customerViewSource.View.Refresh();
+                    customerViewSource.View.MoveCurrentTo(customer);
+                    ctx.SaveChanges();
+                }
+                // using System.Data;
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
+                lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
+                //bodyStyleTextBox.SetBinding(TextBox.TextProperty, bodyStyleTextBoxBinding);
+            }
+            else if (action == ActionState.Edit)
+            {
+                try
+                {
+                    car = (Car)carDataGrid.SelectedItem;
+                    car.Make = makeTextBox.Text.Trim();
+                    car.Model = modelTextBox.Text.Trim();
+                    car.BodyStyle = bodyStyleTextBox.Text.Trim();
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                carViewSource.View.Refresh();
+                carViewSource.View.MoveCurrentTo(car);
+                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
+               bodyStyleTextBoxBinding);
+            }
+            else if (action == ActionState.Delete)
+            {
+                try
+                {
+                    car = (Car)carDataGrid.SelectedItem;
+                    ctx.Cars.Remove(car);
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                carViewSource.View.Refresh();
+                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
+                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
+                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
+               bodyStyleTextBoxBinding);
+            }
+        }
+
+
     }
 }
