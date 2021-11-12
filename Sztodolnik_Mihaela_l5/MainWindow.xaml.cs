@@ -27,6 +27,7 @@ namespace Sztodolnik_Mihaela_l5
         ActionState action = ActionState.Nothing;
         AutoGeistEntitiesModel ctx = new AutoGeistEntitiesModel();
         CollectionViewSource carViewSource;
+        CollectionViewSource carOrdersViewSource;
         CollectionViewSource customerViewSource;
         Binding bodyStyleTextBoxBinding = new Binding();
         Binding modelTextBoxBinding = new Binding();
@@ -57,17 +58,23 @@ namespace Sztodolnik_Mihaela_l5
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
-            System.Windows.Data.CollectionViewSource carViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("carViewSource")));
-            // Load data by setting the CollectionViewSource.Source property:
-            // carViewSource.Source = [generic data source]
-            System.Windows.Data.CollectionViewSource customerViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("customerViewSource")));
-            // Load data by setting the CollectionViewSource.Source property:
-            // customerViewSource.Source = [generic data source]
-            carViewSource =
-        ((System.Windows.Data.CollectionViewSource)(this.FindResource("carViewSource")));
+            carViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("carViewSource")));
             carViewSource.Source = ctx.Cars.Local;
             ctx.Cars.Load();
+            customerViewSource = (System.Windows.Data.CollectionViewSource)(this.FindResource("customerViewSource"));
+            customerViewSource.Source = ctx.Customers.Local;
+            ctx.Customers.Load();
+            carOrdersViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("carOrdersViewSource")));
+            //carOrdersViewSource.Source = ctx.Orders.Local;
+            ctx.Orders.Load();
+            BindDataGrid();
+            cbCars.ItemsSource = ctx.Cars.Local;
+            //cbCars.DisplayMemberPath = "Make";
+            cbCars.SelectedValuePath = "CarId";
+            cbCustomers.ItemsSource = ctx.Customers.Local;
+            //cbCustomers.DisplayMemberPath = "FirstName";
+            cbCustomers.SelectedValuePath = "CustId";
+
         }
         private void btnNew_Click(object sender, RoutedEventArgs e)
         {
@@ -203,7 +210,7 @@ namespace Sztodolnik_Mihaela_l5
                         LastName = lastNameTextBox.Text.Trim(),
                         PurchaseDate = DateTime.ParseExact(purchaseDateDatePicker.ToString(),"dd/MM/yyyy",null),
                     };
-                    ctx.Customer.Add(customer);
+                    ctx.Customers.Add(customer);
                     customerViewSource.View.Refresh();
                     customerViewSource.View.MoveCurrentTo(customer);
                     ctx.SaveChanges();
@@ -242,7 +249,7 @@ namespace Sztodolnik_Mihaela_l5
                 try
                 {
                     customer = (Customer)customerDataGrid.SelectedItem;
-                    ctx.Customer.Remove(customer);
+                    ctx.Customers.Remove(customer);
                     ctx.SaveChanges();
                 }
                 catch (DataException ex)
@@ -296,6 +303,97 @@ namespace Sztodolnik_Mihaela_l5
             }
             ReInitialize();
         }
+        private void SaveOrders()
+        {
+            Order order = null;
+            if (action == ActionState.New)
+            {
+                try
+                {
+                    Car car = (Car)cbCars.SelectedItem;
+                    Customer customer = (Customer)cbCustomers.SelectedItem;
+                    //instantiem Order entity
+                    order = new Order()
+                    {
+                        CarId = car.CarId,
+                        CustId = customer.CustId
+                    };
+                    //adaugam entitatea nou creata in context
+                    ctx.Orders.Add(order);
+                    ctx.SaveChanges();
+                    BindDataGrid();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else if (action == ActionState.Edit)
+            {
+                dynamic selectedOrder = ordersDataGrid.SelectedItem;
+                try
+                {
+                    int curr_id = selectedOrder.OrderId;
+                    var editedOrder = ctx.Orders.FirstOrDefault(s => s.OrderId ==
+                    curr_id);
+                    if (editedOrder != null)
+                    {
+                        editedOrder.CarId =
+                       Convert.ToInt32(cbCars.SelectedValue.ToString());
+                        editedOrder.CustId =
+                       Int32.Parse(cbCustomers.SelectedValue.ToString());
+                        //salvam modificarile
+                        ctx.SaveChanges();
+                    }
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                BindDataGrid();
+                // pozitionarea pe item-ul curent
+                carOrdersViewSource.View.MoveCurrentTo(selectedOrder);
+            }
+            else if (action == ActionState.Delete)
+            {
+                try
+                {
+                    dynamic selectedOrder = ordersDataGrid.SelectedItem;
+                    int curr_id = selectedOrder.OrderId;
+                    var deletedOrder = ctx.Orders.FirstOrDefault(s => s.OrderId ==
+                   curr_id);
+                    if (deletedOrder != null)
+                    {
+                        ctx.Orders.Remove(deletedOrder);
+                        ctx.SaveChanges();
+                        MessageBox.Show("Order Deleted Successfully", "Message");
+                        BindDataGrid();
+                    }
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+        private void BindDataGrid()
+{
+ var queryOrder = from ord in ctx.Orders
+ join cust in ctx.Customers on ord.CustId equals cust.CustId
+ join car in ctx.Cars on ord.CarId equals car.CarId
+ select new
+{
+ ord.OrderId,
+ ord.CarId,
+ ord.CustId,
+ cust.FirstName,
+cust.LastName,
+car.Make,
+ car.Model
+ };
+ carOrdersViewSource.Source = queryOrder.ToList();
+}
+
 
 
     }
