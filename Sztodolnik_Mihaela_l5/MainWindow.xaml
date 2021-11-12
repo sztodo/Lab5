@@ -103,14 +103,14 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <GroupBox Header="CRUD" HorizontalAlignment="Left" Height="102" Margin="10,71,0,0" VerticalAlignment="Top" Width="89">
+        <GroupBox x:Name="gbOperations" Header="CRUD" Button.Click="gbOperations_Click" HorizontalAlignment="Left" Height="102" Margin="10,71,0,0" VerticalAlignment="Top" Width="89">
             <StackPanel HorizontalAlignment="Left" Height="72" Margin="0,10,-12.2,-2" VerticalAlignment="Top" Width="81" RenderTransformOrigin="0.479,0.436">
                 <Button x:Name="btnNew" Content="New" HorizontalAlignment="Left" VerticalAlignment="Top" Width="71"/>
                 <Button x:Name="btnEdit" Content="Edit" HorizontalAlignment="Left" VerticalAlignment="Top" Width="71"/>
                 <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Top" Width="71" Height="24"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="Actions" HorizontalAlignment="Left" Height="84" Margin="19,298,0,0" VerticalAlignment="Top" Width="89">
+        <GroupBox x:Name="gbActions" Header="Actions" HorizontalAlignment="Left" Height="84" Margin="19,298,0,0" VerticalAlignment="Top" Width="89">
             <StackPanel HorizontalAlignment="Left" Height="46" Margin="0,10,0,0" VerticalAlignment="Top" Width="75">
                 <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75"/>
                 <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75"/>

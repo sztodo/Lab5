@@ -48,10 +48,10 @@ namespace Sztodolnik_Mihaela_l5
             bodyStyleTextBox.SetBinding(TextBox.TextProperty, bodyStyleTextBoxBinding);
             fnameTextBoxBinding.Path = new PropertyPath("FirstName");
             lnameTextBoxBinding.Path = new PropertyPath("LastName");
-            //purchaseTextBoxBinding.Path = new PropertyPath("PurchaseDate");
+            purchaseTextBoxBinding.Path = new PropertyPath("PurchaseDate");
             firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
             lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
-            //purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
+            purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
 
         }
 
@@ -120,6 +120,8 @@ namespace Sztodolnik_Mihaela_l5
         {
             customerViewSource.View.MoveCurrentToPrevious();
         }
+        private void SaveInventory()
+        { }
         private void SaveCars()
         {
             Car car = null;
@@ -213,7 +215,7 @@ namespace Sztodolnik_Mihaela_l5
                 }
                 firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
                 lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
-                //bodyStyleTextBox.SetBinding(TextBox.TextProperty, bodyStyleTextBoxBinding);
+                purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
             }
             else if (action == ActionState.Edit)
             {
@@ -229,31 +231,70 @@ namespace Sztodolnik_Mihaela_l5
                 {
                     MessageBox.Show(ex.Message);
                 }
-                carViewSource.View.Refresh();
-                carViewSource.View.MoveCurrentTo(car);
-                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
-                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
-                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
-               bodyStyleTextBoxBinding);
+                customerViewSource.View.Refresh();
+                customerViewSource.View.MoveCurrentTo(customer);
+                firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
+                lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
+                purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
             }
             else if (action == ActionState.Delete)
             {
                 try
                 {
-                    car = (Car)carDataGrid.SelectedItem;
-                    ctx.Cars.Remove(car);
+                    customer = (Customer)customerDataGrid.SelectedItem;
+                    ctx.Customer.Remove(customer);
                     ctx.SaveChanges();
                 }
                 catch (DataException ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-                carViewSource.View.Refresh();
-                makeTextBox.SetBinding(TextBox.TextProperty, makeTextBoxBinding);
-                modelTextBox.SetBinding(TextBox.TextProperty, modelTextBoxBinding);
-                bodyStyleTextBox.SetBinding(TextBox.TextProperty,
-               bodyStyleTextBoxBinding);
+                customerViewSource.View.Refresh();
+                firstNameTextBox.SetBinding(TextBox.TextProperty, fnameTextBoxBinding);
+                lastNameTextBox.SetBinding(TextBox.TextProperty, lnameTextBoxBinding);
+                purchaseDateDatePicker.SetBinding(TextBox.TextProperty, purchaseTextBoxBinding);
             }
+        }
+        private void gbOperations_Click(object sender, RoutedEventArgs e)
+        {
+            Button SelectedButton = (Button)e.OriginalSource;
+            Panel panel = (Panel)SelectedButton.Parent;
+            foreach (Button B in panel.Children.OfType<Button>())
+            {
+                if (B != SelectedButton)
+                    B.IsEnabled = false;
+            }
+            gbActions.IsEnabled = true;
+        }
+        private void ReInitialize()
+        {
+            Panel panel = gbOperations.Content as Panel;
+            foreach (Button B in panel.Children.OfType<Button>())
+            {
+                B.IsEnabled = true;
+            }
+            gbActions.IsEnabled = false;
+        }
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            ReInitialize();
+        }
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+
+            TabItem ti = tbCtrlAutoGeist.SelectedItem as TabItem;
+            switch (ti.Header)
+            {
+                case "Cars":
+                    SaveCars();
+                    break;
+                case "Customers":
+                    SaveInventory();
+                    break;
+                case "Orders":
+                    break;
+            }
+            ReInitialize();
         }
 
 
