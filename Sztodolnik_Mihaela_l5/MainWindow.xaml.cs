@@ -199,7 +199,7 @@ namespace Sztodolnik_Mihaela_l5
                     {
                         FirstName = firstNameTextBox.Text.Trim(),
                         LastName = lastNameTextBox.Text.Trim(),
-                        PurchaseDate = purchaseDateDatePicker.ClearValue.ToString("dd/MM/yyy"),
+                        PurchaseDate = DateTime.ParseExact(purchaseDateDatePicker.ToString(),"dd/MM/yyyy",null),
                     };
                     ctx.Customer.Add(customer);
                     customerViewSource.View.Refresh();
@@ -219,10 +219,10 @@ namespace Sztodolnik_Mihaela_l5
             {
                 try
                 {
-                    car = (Car)carDataGrid.SelectedItem;
-                    car.Make = makeTextBox.Text.Trim();
-                    car.Model = modelTextBox.Text.Trim();
-                    car.BodyStyle = bodyStyleTextBox.Text.Trim();
+                    customer = (Customer)customerDataGrid.SelectedItem;
+                    customer.FirstName = firstNameTextBox.Text.Trim();
+                    customer.LastName = lastNameTextBox.Text.Trim();
+                    customer.PurchaseDate = DateTime.ParseExact(purchaseDateDatePicker.ToString(), "dd/MM/yyyy", null);
                     ctx.SaveChanges();
                 }
                 catch (DataException ex)
