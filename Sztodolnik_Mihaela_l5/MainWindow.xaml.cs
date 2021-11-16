@@ -127,8 +127,6 @@ namespace Sztodolnik_Mihaela_l5
         {
             customerViewSource.View.MoveCurrentToPrevious();
         }
-        private void SaveInventory()
-        { }
         private void SaveCars()
         {
             Car car = null;
@@ -296,7 +294,7 @@ namespace Sztodolnik_Mihaela_l5
                     SaveCars();
                     break;
                 case "Customers":
-                    SaveInventory();
+                    SaveCustomers();
                     break;
                 case "Orders":
                     break;
