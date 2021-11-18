@@ -27,7 +27,7 @@ namespace Sztodolnik_Mihaela_l5
         ActionState action = ActionState.Nothing;
         AutoGeistEntitiesModel ctx = new AutoGeistEntitiesModel();
         CollectionViewSource carViewSource;
-        CollectionViewSource carOrdersViewSource;
+        CollectionViewSource carOrderViewSource;
         CollectionViewSource customerViewSource;
         Binding bodyStyleTextBoxBinding = new Binding();
         Binding modelTextBoxBinding = new Binding();
@@ -64,7 +64,7 @@ namespace Sztodolnik_Mihaela_l5
             customerViewSource = (System.Windows.Data.CollectionViewSource)(this.FindResource("customerViewSource"));
             customerViewSource.Source = ctx.Customers.Local;
             ctx.Customers.Load();
-            carOrdersViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("carOrdersViewSource")));
+            carOrderViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("carViewSource")));
             //carOrdersViewSource.Source = ctx.Orders.Local;
             ctx.Orders.Load();
             BindDataGrid();
@@ -350,7 +350,7 @@ namespace Sztodolnik_Mihaela_l5
                 }
                 BindDataGrid();
                 // pozitionarea pe item-ul curent
-                carOrdersViewSource.View.MoveCurrentTo(selectedOrder);
+                carOrderViewSource.View.MoveCurrentTo(selectedOrder);
             }
             else if (action == ActionState.Delete)
             {
@@ -389,7 +389,7 @@ cust.LastName,
 car.Make,
  car.Model
  };
- carOrdersViewSource.Source = queryOrder.ToList();
+ carOrderViewSource.Source = queryOrder.ToList();
 }
 
 

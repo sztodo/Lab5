@@ -12,6 +12,12 @@
         <CollectionViewSource x:Key="customerViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoGeisdtModel:Customer}, CreateList=True}"/>
         <CollectionViewSource x:Key="carOrderViewSource" Source="{Binding Order, Source={StaticResource carViewSource}}"/>
         <CollectionViewSource x:Key="customerOrderViewSource" Source="{Binding Order, Source={StaticResource customerViewSource}}"/>
+        <ControlTemplate x:Key="validationTemplate">
+            <DockPanel>
+                <TextBlock Foreground="Red" FontSize="20">!</TextBlock>
+                <AdornedElementPlaceholder/>
+            </DockPanel>
+        </ControlTemplate>
     </Window.Resources>
     <Grid Margin="0,0,4,1.8">
         <TabControl x:Name="tbCtrlAutoGeist" HorizontalAlignment="Left" Height="372" Margin="151,39,0,0" VerticalAlignment="Top" Width="611">
