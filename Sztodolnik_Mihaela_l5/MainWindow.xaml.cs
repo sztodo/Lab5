@@ -97,6 +97,7 @@ namespace Sztodolnik_Mihaela_l5
                     firstNameTextBox.Text = "";
                     lastNameTextBox.Text = "";
                     Keyboard.Focus(firstNameTextBox);
+                    SetValidationBinding();
                     break;
                 case "Orders":
                     break;
@@ -105,6 +106,7 @@ namespace Sztodolnik_Mihaela_l5
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
             action = ActionState.Edit;
+            SetValidationBinding();
         }
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
@@ -374,6 +376,29 @@ namespace Sztodolnik_Mihaela_l5
                 }
             }
         }
+        private void SetValidationBinding()
+        {
+            Binding firstNameValidationBinding = new Binding();
+            firstNameValidationBinding.Source = customerViewSource;
+            firstNameValidationBinding.Path = new PropertyPath("FirstName");
+            firstNameValidationBinding.NotifyOnValidationError = true;
+            firstNameValidationBinding.Mode = BindingMode.TwoWay;
+            firstNameValidationBinding.UpdateSourceTrigger =
+           UpdateSourceTrigger.PropertyChanged;
+            //string required
+            firstNameValidationBinding.ValidationRules.Add(new StringNotEmpty());
+            firstNameTextBox.SetBinding(TextBox.TextProperty, firstNameValidationBinding);
+            Binding lastNameValidationBinding = new Binding();
+            lastNameValidationBinding.Source = customerViewSource;
+            lastNameValidationBinding.Path = new PropertyPath("LastName");
+            lastNameValidationBinding.NotifyOnValidationError = true;
+            lastNameValidationBinding.Mode = BindingMode.TwoWay;
+            lastNameValidationBinding.UpdateSourceTrigger =
+           UpdateSourceTrigger.PropertyChanged;
+            //string min length validator
+            lastNameValidationBinding.ValidationRules.Add(new StringMinLength());
+            lastNameTextBox.SetBinding(TextBox.TextProperty, lastNameValidationBinding); //setare binding nou
+}
         private void BindDataGrid()
 {
  var queryOrder = from ord in ctx.Orders

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Sztodolnik_Mihaela_l5
 {
@@ -22,17 +23,12 @@ namespace Sztodolnik_Mihaela_l5
     //validator pentru lungime minima a string-ului
     public class StringMinLength : ValidationRule
     {
-        public override ValidationResult Validate(object value,
-        System.Globalization.CultureInfo cultureinfo)
+        public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureinfo)
         {
             string aString = value.ToString();
             if (aString.Length < 3)
-                return new ValidationResult(false, "String must have at least 3
-               characters!");
+                return new ValidationResult(false, "String must have at least 3 characters!");
         return new ValidationResult(true, null);
         }
-    }
-    class Validation
-    {
     }
 }
